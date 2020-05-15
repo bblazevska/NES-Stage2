@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
 
@@ -19,6 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MyService extends Service {
+
     protected static final int NOT_ID = 150;
     private static String TAG = "Service";
 
@@ -28,6 +28,9 @@ public class MyService extends Service {
     private TimerTask timerTask;
     public NetworkCheckClass networkCheck;
     public Context context;
+    public int pingNumber = 0;
+
+    private final static int INTERVAL = 600*1000;
 
 
 
@@ -54,13 +57,18 @@ public class MyService extends Service {
         boolean network = networkCheck.networkCheck();
 
         if(network){
-            Log.i("START_COMMAND","Connected to the internet");
-            new NetworkPING().execute();
+            Log.i("MAKE_PING","START_COMAND: Connected to the internet");
+            Thread t = new Thread(){
+                public void run(){
+                    taskDelayLoop();
+                }
+            };
+            t.start();
         }else{
             Log.i("START_COMMAND","NOT connected to the internet");
         }
 
-        Log.i("START_COMMAND","The onStartCommand() is called");
+        Log.i("MAKE_PING","START_COMMAND: The onStartCommand() is called");
 
         SharedPreferences prefs= getSharedPreferences("com.example.neverendingservice.ActiveServiceRunning", MODE_PRIVATE);
 
@@ -78,6 +86,20 @@ public class MyService extends Service {
         startTimer();
 
         return START_STICKY;
+    }
+
+    public void taskDelayLoop(){
+        while(true){
+
+            new NetworkPING().execute();
+            Log.i("MAKE_PING","vleguva vo doInBackground");
+            try{
+                Thread.sleep(INTERVAL);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void startTimer() {

@@ -33,24 +33,17 @@ public class NetworkPING extends AsyncTask<Void,Void,String> {
                 host = jsonObject.getString("host");
                 count = jsonObject.getInt("count");
                 packetSize = jsonObject.getInt("packetSize");
+                jobPeriod = jsonObject.getInt("jobPeriod");
 
+                for(int j=0; j<=(int)(600/jobPeriod);j++){
+                    ping = makePING(host,count,packetSize);
 
-                try{
-                    String pingCmd = "ping -s "+ packetSize + " -c "+ count + " " + host;
-                    Runtime runtime = Runtime.getRuntime();
-                    Process process = runtime.exec(pingCmd);
-                    BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line ;
-                    while ((line = input.readLine()) != null){
-                        Log.i("PINGLINE", "doInBackground: " + line);
-                        ping += line;
-
+                    Log.i("MAKE_PING",ping);
+                    try{
+                        Thread.sleep(jobPeriod*1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    input.close();
-                    Log.i("PING", "doInBackground: " + ping);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
 
@@ -58,5 +51,32 @@ public class NetworkPING extends AsyncTask<Void,Void,String> {
             e.printStackTrace();
         }
         return ping;
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+    }
+
+    public String makePING(String Host , int Count, int PacketSize){
+        String Ping = "";
+        try{
+
+            String pingCmd = "ping -s " + PacketSize + " -c "+ Count + " " + Host;
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(pingCmd);
+            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            line = " ";
+            while ((line = input.readLine()) != null){
+                Ping += line;
+
+            }
+            input.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return Ping;
     }
 }
