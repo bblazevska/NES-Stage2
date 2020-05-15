@@ -1,6 +1,7 @@
 package com.example.neverendingservice;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -10,6 +11,8 @@ import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
 
+import com.example.neverendingservice.NetworkTasks.NetworkCheckClass;
+import com.example.neverendingservice.NetworkTasks.NetworkPING;
 import com.example.neverendingservice.Notification.ServiceNotification;
 
 import java.util.Timer;
@@ -23,9 +26,13 @@ public class MyService extends Service {
     private int timeCounter ;
     private static Timer timer;
     private TimerTask timerTask;
+    public NetworkCheckClass networkCheck;
+    public Context context;
+
 
 
     public MyService() {
+
         super();
     }
 
@@ -43,6 +50,17 @@ public class MyService extends Service {
         super.onStartCommand(intent, flags, startId);
 
        // Log.d(TAG , "Restarting service  ");
+        networkCheck = new NetworkCheckClass(this);
+        boolean network = networkCheck.networkCheck();
+
+        if(network){
+            Log.i("START_COMMAND","Connected to the internet");
+            new NetworkPING().execute();
+        }else{
+            Log.i("START_COMMAND","NOT connected to the internet");
+        }
+
+        Log.i("START_COMMAND","The onStartCommand() is called");
 
         SharedPreferences prefs= getSharedPreferences("com.example.neverendingservice.ActiveServiceRunning", MODE_PRIVATE);
 

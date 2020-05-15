@@ -27,7 +27,7 @@ public class getJSON {
             Uri buildUri = Uri.parse(Url).buildUpon().build();
             URL requestURL = new URL(buildUri.toString());
 
-            httpURLConnection = (HttpsURLConnection) requestURL.openConnection();
+            httpURLConnection = (HttpURLConnection) requestURL.openConnection();
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.connect();
 
